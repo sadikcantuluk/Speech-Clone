@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Avatar - Speech & Avatar App{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-user-circle"></i> Avatar Studio</h1>
+            <p>Create your digital avatar and generate speaking videos</p>
+        </div>
+
+        <div class="avatar-container">
+            <!-- Avatar Status -->
+            <div class="avatar-status card">
+                <h2>Your Avatar</h2>
+                <div id="avatar-display" class="avatar-display">
+                    {% if avatar and avatar.avatar_url %}
+                        <img src="{{ avatar.avatar_url }}" alt="Your Avatar" class="avatar-image" onerror="this.src='/static/img/avatar-placeholder.png'">
+                        <div class="avatar-info">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <p>Avatar created successfully!</p>
+                            {% if avatar.fallback %}
+                                <small style="color: var(--warning-color);">Using original photo (DALL-E unavailable)</small>
+                            {% endif %}
+                        </div>
+                        <button id="delete-avatar-btn" class="btn btn-outline" style="margin-top: 1rem;">
+                            <i class="fas fa-trash"></i> Delete Avatar & Create New
+                        </button>
+                    {% else %}
+                        <div class="avatar-placeholder">
+                            <i class="fas fa-user-circle"></i>
+                            <p>No avatar created yet</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Create Avatar Section -->
+            <div id="create-avatar-section" class="create-avatar-section card" {% if avatar and avatar.avatar_url %}style="display: none"{% endif %}>
+                <h2>Create Your Avatar</h2>
+                <p>Upload your photo to create a personalized digital avatar</p>
+                
+                <div class="upload-area" id="photo-upload-area">
+                    <input type="file" id="photo-input" accept="image/*" hidden>
+                    <i class="fas fa-camera"></i>
+                    <p>Click to upload your photo</p>
+                    <small>Supported: JPG, PNG, WEBP (Max 25MB)</small>
+                </div>
+
+                <div class="photo-preview" id="photo-preview" style="display: none;">
+                    <img id="preview-image" src="" alt="Preview">
+                    <button class="btn-icon" id="remove-photo">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <button id="create-avatar-btn" class="btn btn-primary btn-block" disabled>
+                    <i class="fas fa-magic"></i> Create Avatar
+                </button>
+            </div>
+
+            <!-- Generate Video Section -->
+            <div class="generate-video-section card">
+                <h2>Generate Avatar Video</h2>
+                {% if avatar.avatar_url %}
+                    <div class="form-group">
+                        <label for="video-text">Text for Avatar to Speak</label>
+                        <textarea 
+                            id="video-text" 
+                            class="form-control" 
+                            rows="4" 
+                            maxlength="1000" 
+                            placeholder="Enter the text your avatar will speak..."
+                        ></textarea>
+                        <small class="form-help">
+                            <span id="video-char-count">0</span> / 1000 characters
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="video-voice">Voice</label>
+                        <select id="video-voice" class="form-control">
+                            <option value="alloy">Alloy (Neutral)</option>
+                            <option value="echo">Echo (Male)</option>
+                            <option value="fable">Fable (Warm)</option>
+                            <option value="onyx">Onyx (Deep Male)</option>
+                            <option value="nova">Nova (Female)</option>
+                            <option value="shimmer">Shimmer (Soft Female)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="use-lipsync" style="width: auto; margin: 0;">
+                        <label for="use-lipsync" style="margin: 0; cursor: pointer;">
+                            🎭 Use Replicate AI Lip-Sync - Makes avatar's mouth move realistically!
+                        </label>
+                    </div>
+                    <small class="form-help" style="margin-top: -1rem; display: block;">
+                        ⚠️ Lip-sync takes 30-90 seconds but produces highly realistic videos (powered by Replicate)
+                    </small>
+
+                    <button id="generate-video-btn" class="btn btn-primary btn-block">
+                        <i class="fas fa-video"></i> Generate Video
+                    </button>
+                {% else %}
+                    <div class="info-message">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Please create your avatar first to generate videos</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Progress Section -->
+            <div class="progress-section" id="progress-section" style="display: none;">
+                <div class="spinner"></div>
+                <p id="progress-text">Processing...</p>
+            </div>
+
+            <!-- Video Result Section -->
+            <div class="result-section card" id="video-result-section" style="display: none;">
+                <h2>Generated Video</h2>
+                
+                <div class="video-player">
+                    <video id="video-player" controls>
+                        Your browser does not support the video element.
+                    </video>
+                </div>
+
+                <div class="result-actions">
+                    <a id="download-video-btn" class="btn btn-outline" download="avatar_video.mp4">
+                        <i class="fas fa-download"></i> Download Video
+                    </a>
+                    <button id="new-video-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Video
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/avatar.js') }}"></script>
+{% endblock %}
+

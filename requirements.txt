@@ -1,0 +1,19 @@
+# Core Web Framework
+Flask==3.0.0
+Flask-CORS==4.0.0
+python-dotenv==1.0.0
+
+# OpenAI API
+openai==1.7.0
+
+# File Processing
+Pillow==10.1.0
+werkzeug==3.0.0
+
+# Audio/Video Processing
+imageio-ffmpeg==0.4.9
+
+# Utilities
+requests==2.31.0
+replicate==0.25.1
+

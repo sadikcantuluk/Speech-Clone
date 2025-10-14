@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Speech & Avatar App{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Welcome to Speech & Avatar App!</h1>
+            <p>Select a feature below to get started</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Speech-to-Text Card -->
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-microphone"></i>
+                </div>
+                <h3>Speech-to-Text</h3>
+                <p>Convert audio and video files to accurate text transcriptions</p>
+                <a href="{{ url_for('main.stt_page') }}" class="btn btn-primary">
+                    Start Transcribing
+                </a>
+            </div>
+
+            <!-- Text-to-Speech Card -->
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-volume-up"></i>
+                </div>
+                <h3>Text-to-Speech</h3>
+                <p>Generate natural-sounding speech from your text</p>
+                <a href="{{ url_for('main.tts_page') }}" class="btn btn-primary">
+                    Create Speech
+                </a>
+            </div>
+
+            <!-- Avatar Card -->
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h3>Avatar Videos</h3>
+                <p>Create personalized videos with your speaking avatar</p>
+                <a href="{{ url_for('main.avatar_page') }}" class="btn btn-primary">
+                    Create Avatar
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <h2>Quick Info</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-file-audio"></i>
+                    <div>
+                        <p class="stat-value">200 MB</p>
+                        <p class="stat-label">Max File Size</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-align-left"></i>
+                    <div>
+                        <p class="stat-value">1000</p>
+                        <p class="stat-label">Max Characters</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-globe"></i>
+                    <div>
+                        <p class="stat-value">Multi-Lang</p>
+                        <p class="stat-label">Support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

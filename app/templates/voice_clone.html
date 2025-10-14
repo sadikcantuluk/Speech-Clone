@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Voice Clone - Speech & Avatar App{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-clone"></i> Voice Cloning Studio</h1>
+            <p>Clone your voice with MiniMax AI and use it for text-to-speech</p>
+        </div>
+
+        <div class="voice-clone-container">
+            <!-- Clone Voice Section -->
+            <div class="clone-section card">
+                <h2>Clone New Voice</h2>
+                <div class="alert alert-info" style="margin-bottom: 20px;">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Önemli:</strong> Ses dosyanız <strong>en az 10 saniye, en fazla 5 dakika</strong> uzunluğunda olmalıdır. 
+                    Video yüklerseniz otomatik olarak ses çıkarılır.
+                </div>
+                
+                <div class="upload-area" id="audio-upload-area">
+                    <input type="file" id="audio-input" accept="audio/*,video/*" hidden>
+                    <i class="fas fa-microphone"></i>
+                    <p>Click to upload audio or video</p>
+                    <small>Audio: MP3, WAV, M4A | Video: MP4, AVI, MOV<br><strong>⏱️ Minimum 10 saniye gerekli!</strong></small>
+                </div>
+
+                <div class="audio-preview" id="audio-preview" style="display: none;">
+                    <audio id="preview-audio" controls></audio>
+                    <button class="btn-icon" id="remove-audio">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="voice-name">Voice Name *</label>
+                    <input 
+                        type="text" 
+                        id="voice-name" 
+                        class="form-control" 
+                        maxlength="50"
+                        placeholder="e.g., My Professional Voice"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="voice-description">Description (Optional)</label>
+                    <textarea 
+                        id="voice-description" 
+                        class="form-control" 
+                        rows="2" 
+                        maxlength="200"
+                        placeholder="Brief description of the voice..."
+                    ></textarea>
+                </div>
+
+                <button id="clone-voice-btn" class="btn btn-primary btn-block" disabled>
+                    <i class="fas fa-magic"></i> Clone Voice
+                </button>
+            </div>
+
+            <!-- My Cloned Voices Section -->
+            <div class="cloned-voices-section card">
+                <h2>My Cloned Voices</h2>
+                
+                <div id="cloned-voices-list">
+                    {% if cloned_voices and cloned_voices|length > 0 %}
+                        {% for voice in cloned_voices %}
+                        <div class="voice-item" data-voice-id="{{ voice.voice_id }}">
+                            <div class="voice-info">
+                                <h3><i class="fas fa-microphone-alt"></i> {{ voice.name }}</h3>
+                                {% if voice.description %}
+                                <p>{{ voice.description }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="voice-actions">
+                                <button class="btn btn-sm btn-outline preview-voice-btn" data-voice-id="{{ voice.voice_id }}">
+                                    <i class="fas fa-play"></i> Preview
+                                </button>
+                                <button class="btn btn-sm btn-danger delete-voice-btn" data-voice-id="{{ voice.voice_id }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-microphone-slash"></i>
+                            <p>No cloned voices yet</p>
+                            <small>Upload an audio sample above to clone your first voice</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Progress Section -->
+            <div class="progress-section" id="progress-section" style="display: none;">
+                <div class="spinner"></div>
+                <p id="progress-text">Processing...</p>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview-section card" id="preview-section" style="display: none;">
+                <h2>Voice Preview</h2>
+                <audio id="preview-player" controls></audio>
+                
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label for="preview-text">Custom Preview Text</label>
+                    <input 
+                        type="text" 
+                        id="preview-text" 
+                        class="form-control" 
+                        placeholder="Enter text to preview with this voice..."
+                        value="Hello! This is a preview of your cloned voice."
+                    >
+                    <button id="regenerate-preview-btn" class="btn btn-outline" style="margin-top: 0.5rem;">
+                        <i class="fas fa-redo"></i> Regenerate Preview
+                    </button>
+                </div>
+
+                <button id="close-preview-btn" class="btn btn-primary btn-block">
+                    Close Preview
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/voice_clone.js') }}"></script>
+{% endblock %}
+

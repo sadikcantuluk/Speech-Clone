@@ -6,6 +6,8 @@ import base64
 from flask import current_app
 import os
 import json
+import subprocess
+import imageio_ffmpeg
 
 class VoiceCloneService:
     """Service for voice cloning and custom voice management"""
@@ -20,6 +22,104 @@ class VoiceCloneService:
             'Authorization': f'Bearer {api_key}',
             'Content-Type': 'application/json'
         }
+    
+    def fix_duplicated_audio(self, audio_file_path):
+        """
+        Fix duplicated audio by cutting it in half from the middle
+        
+        This addresses the issue where MiniMax API sometimes returns
+        duplicated audio content (same speech repeated twice)
+        
+        Args:
+            audio_file_path: Path to the audio file to fix
+            
+        Returns:
+            str: Path to the fixed audio file, or original path if fixing failed
+        """
+        try:
+            print(f"🔧 Fixing duplicated audio: {os.path.basename(audio_file_path)}")
+            
+            # Get FFmpeg executable
+            ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+            
+            # First, get the duration of the audio file
+            duration_cmd = [
+                ffmpeg_exe, 
+                '-i', audio_file_path,
+                '-f', 'null', '-'
+            ]
+            
+            result = subprocess.run(duration_cmd, capture_output=True, text=True)
+            duration_line = None
+            
+            # Parse duration from stderr (FFmpeg outputs info to stderr)
+            for line in result.stderr.split('\n'):
+                if 'Duration:' in line:
+                    duration_line = line
+                    break
+            
+            if not duration_line:
+                print(f"⚠️ Could not get audio duration, returning original file")
+                return audio_file_path
+            
+            # Extract duration in format "Duration: HH:MM:SS.ms"
+            import re
+            duration_match = re.search(r'Duration: (\d{2}):(\d{2}):(\d{2}\.\d{2})', duration_line)
+            if not duration_match:
+                print(f"⚠️ Could not parse duration, returning original file")
+                return audio_file_path
+            
+            hours, minutes, seconds = duration_match.groups()
+            total_seconds = int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+            
+            print(f"📏 Original audio duration: {total_seconds:.2f} seconds")
+            
+            # Calculate half duration
+            half_duration = total_seconds / 2
+            print(f"✂️ Cutting to first half: {half_duration:.2f} seconds")
+            
+            # Create output path
+            input_dir = os.path.dirname(audio_file_path)
+            input_name = os.path.splitext(os.path.basename(audio_file_path))[0]
+            fixed_path = os.path.join(input_dir, f"{input_name}_fixed.mp3")
+            
+            # Cut audio to first half using FFmpeg
+            cut_cmd = [
+                ffmpeg_exe,
+                '-i', audio_file_path,
+                '-t', str(half_duration),  # Duration to extract
+                '-acodec', 'copy',         # Copy audio codec (faster)
+                '-y',                      # Overwrite output
+                fixed_path
+            ]
+            
+            print(f"🏃 Running: {' '.join(cut_cmd[:3])} ... -t {half_duration:.2f} ... {os.path.basename(fixed_path)}")
+            
+            result = subprocess.run(cut_cmd, capture_output=True, text=True)
+            
+            if result.returncode != 0:
+                print(f"❌ FFmpeg cutting failed: {result.stderr}")
+                return audio_file_path
+            
+            # Check if fixed file was created and is valid
+            if os.path.exists(fixed_path) and os.path.getsize(fixed_path) > 0:
+                print(f"✅ Audio fixed successfully!")
+                print(f"  📏 Original: {os.path.getsize(audio_file_path)} bytes")
+                print(f"  📏 Fixed: {os.path.getsize(fixed_path)} bytes")
+                
+                # Replace original file with fixed one
+                os.remove(audio_file_path)
+                os.rename(fixed_path, audio_file_path)
+                print(f"🔄 Replaced original file with fixed version")
+                
+                return audio_file_path
+            else:
+                print(f"❌ Fixed file was not created or is empty")
+                return audio_file_path
+                
+        except Exception as e:
+            print(f"❌ Audio fixing error: {str(e)}")
+            return audio_file_path
     
     def clone_voice(self, audio_file_path, voice_name, voice_description=None):
         """
@@ -345,7 +445,11 @@ class VoiceCloneService:
                         print(f"✅ Total audio: {len(audio_data)} bytes")
                         with open(output_path, 'wb') as f:
                             f.write(audio_data)
-                        return {'success': True, 'audio_path': output_path}
+                        
+                        # Fix duplicated audio by cutting in half
+                        fixed_path = self.fix_duplicated_audio(output_path)
+                        
+                        return {'success': True, 'audio_path': fixed_path}
                     else:
                         return {'success': False, 'error': 'No audio data in SSE stream'}
                 
@@ -363,9 +467,12 @@ class VoiceCloneService:
                     with open(output_path, 'wb') as f:
                         f.write(audio_data)
                     
+                    # Fix duplicated audio by cutting in half
+                    fixed_path = self.fix_duplicated_audio(output_path)
+                    
                     return {
                         'success': True,
-                        'audio_path': output_path
+                        'audio_path': fixed_path
                     }
                 
                 # Otherwise JSON response
@@ -506,9 +613,12 @@ class VoiceCloneService:
             with open(output_path, 'wb') as f:
                 f.write(audio_data)
             
+            # Fix duplicated audio by cutting in half
+            fixed_path = self.fix_duplicated_audio(output_path)
+            
             return {
                 'success': True,
-                'audio_path': output_path
+                'audio_path': fixed_path
             }
             
         except requests.exceptions.RequestException as e:

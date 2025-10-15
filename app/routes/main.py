@@ -28,12 +28,12 @@ def tts_page():
     cloned_voices = session.get('cloned_voices', [])
     return render_template('tts.html', cloned_voices=cloned_voices)
 
-@bp.route('/avatar')
-def avatar_page():
-    """Avatar creation page"""
-    # Check if avatar exists in session
-    avatar_data = session.get('avatar', {})
-    return render_template('avatar.html', avatar=avatar_data)
+@bp.route('/dubbing')
+def dubbing_page():
+    """Video dubbing page"""
+    # Get cloned voices from session for dubbing options
+    cloned_voices = session.get('cloned_voices', [])
+    return render_template('dubbing.html', cloned_voices=cloned_voices)
 
 @bp.route('/temp/<path:filename>')
 def serve_temp_file(filename):

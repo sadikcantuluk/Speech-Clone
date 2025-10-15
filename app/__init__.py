@@ -57,12 +57,12 @@ def create_app(config_name='default'):
     CORS(app)
     
     # Register blueprints
-    from app.routes import main, stt, tts, avatar, voice_clone
+    from app.routes import main, stt, tts, dubbing, voice_clone
     
     app.register_blueprint(main.bp)
     app.register_blueprint(stt.bp, url_prefix='/api/stt')
     app.register_blueprint(tts.bp, url_prefix='/api/tts')
-    app.register_blueprint(avatar.bp, url_prefix='/api/avatar')
+    app.register_blueprint(dubbing.bp, url_prefix='/dubbing')
     app.register_blueprint(voice_clone.bp, url_prefix='/voice-clone')
     
     return app

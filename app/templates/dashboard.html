@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Speech & Avatar App{% endblock %}
+{% block title %}Dashboard - Speech & Clone App{% endblock %}
 
 {% block content %}
 <div class="dashboard">
     <div class="container">
         <div class="dashboard-header">
-            <h1>Welcome to Speech & Avatar App!</h1>
+            <h1>Welcome to Speech & Clone App!</h1>
             <p>Select a feature below to get started</p>
         </div>
 
@@ -35,8 +35,8 @@
                 </a>
             </div>
 
-            <!-- Avatar Card -->
-            <div class="dashboard-card">
+            <!-- Avatar Card - Temporarily disabled -->
+            <!-- <div class="dashboard-card">
                 <div class="card-icon">
                     <i class="fas fa-user-circle"></i>
                 </div>
@@ -44,6 +44,18 @@
                 <p>Create personalized videos with your speaking avatar</p>
                 <a href="{{ url_for('main.avatar_page') }}" class="btn btn-primary">
                     Create Avatar
+                </a>
+            </div> -->
+
+            <!-- Voice Clone Card -->
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-clone"></i>
+                </div>
+                <h3>Voice Clone</h3>
+                <p>Clone and generate speech with custom voice models</p>
+                <a href="{{ url_for('voice_clone.index') }}" class="btn btn-primary">
+                    Clone Voice
                 </a>
             </div>
         </div>

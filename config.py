@@ -35,7 +35,7 @@ class Config:
     ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp'}
     
     # Application
-    APP_NAME = os.getenv('APP_NAME', 'Speech & Avatar App')
+    APP_NAME = os.getenv('APP_NAME', 'Speech & Clone App')
     APP_URL = os.getenv('APP_URL', 'http://localhost:5000')
     
     @staticmethod

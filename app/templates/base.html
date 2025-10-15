@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Speech & Avatar App{% endblock %}</title>
+    <title>{% block title %}Speech & Clone App{% endblock %}</title>
     
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -19,7 +19,7 @@
             <div class="nav-brand">
                 <a href="{{ url_for('main.index') }}">
                     <i class="fas fa-microphone-alt"></i>
-                    Speech & Avatar
+                    Speech & Clone
                 </a>
             </div>
             <div class="nav-menu">
@@ -32,9 +32,9 @@
                 <a href="{{ url_for('main.tts_page') }}" class="nav-link">
                     <i class="fas fa-volume-up"></i> Text-to-Speech
                 </a>
-                <a href="{{ url_for('main.avatar_page') }}" class="nav-link">
+                <!-- <a href="{{ url_for('main.avatar_page') }}" class="nav-link">
                     <i class="fas fa-user-circle"></i> Avatar
-                </a>
+                </a> -->
                 <a href="{{ url_for('voice_clone.index') }}" class="nav-link">
                     <i class="fas fa-clone"></i> Voice Clone
                 </a>
@@ -53,7 +53,7 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 Speech & Avatar App. Internal Development Version.</p>
+            <p>&copy; 2024 Speech & Clone App. Internal Development Version.</p>
         </div>
     </footer>
 

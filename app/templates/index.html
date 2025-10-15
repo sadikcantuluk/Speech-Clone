@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Home - Speech & Avatar App{% endblock %}
+{% block title %}Home - Speech & Clone App{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
@@ -9,7 +9,7 @@
         <div class="hero-content">
             <h1>Transform Your Voice & Vision</h1>
             <p class="hero-subtitle">
-                Powerful speech-to-text and text-to-speech technology with personalized avatar integration
+                Powerful speech-to-text and text-to-speech technology with advanced voice cloning capabilities
             </p>
             <div class="hero-buttons">
                 <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg">
@@ -44,12 +44,21 @@
                 <p>Generate natural-sounding speech from text in your preferred voice and language.</p>
             </div>
             
-            <div class="feature-card">
+            <!-- Avatar Integration - Temporarily disabled -->
+            <!-- <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-user-circle"></i>
                 </div>
                 <h3>Avatar Integration</h3>
                 <p>Create your personalized digital avatar and generate videos with your avatar speaking your content.</p>
+            </div> -->
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-clone"></i>
+                </div>
+                <h3>Voice Cloning</h3>
+                <p>Clone voices and generate personalized speech with custom voice models using advanced AI technology.</p>
             </div>
             
             <div class="feature-card">
@@ -87,7 +96,7 @@
             <div class="step">
                 <div class="step-number">1</div>
                 <h3>Choose Your Feature</h3>
-                <p>Speech-to-Text, Text-to-Speech, or Avatar Videos</p>
+                <p>Speech-to-Text, Text-to-Speech, or Voice Cloning</p>
             </div>
             
             <div class="step">
@@ -99,7 +108,7 @@
             <div class="step">
                 <div class="step-number">3</div>
                 <h3>Get Your Results</h3>
-                <p>Download transcriptions, audio, or avatar videos instantly</p>
+                <p>Download transcriptions, audio, or cloned voice content instantly</p>
             </div>
         </div>
     </div>
@@ -109,7 +118,7 @@
 <section class="cta">
     <div class="container">
         <h2>Ready to Get Started?</h2>
-        <p>Experience the future of speech and avatar technology</p>
+        <p>Experience the future of speech and voice cloning technology</p>
         <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg">
             Go to Dashboard
         </a>

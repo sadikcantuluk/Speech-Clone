@@ -92,9 +92,9 @@ def generate_speech_json():
     
     try:
         if is_cloned:
-            # Use ElevenLabs for cloned voice
+            # Use MiniMax for cloned voice
             voice_id = voice.replace('cloned:', '')
-            result = voice_clone_service.generate_speech_with_cloned_voice(text, voice_id)
+            result = voice_clone_service.generate_speech_with_cloned_voice(text, voice_id, translate_to=translate_to)
         else:
             # Use OpenAI for standard voices
             allowed_voices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer']
@@ -105,7 +105,7 @@ def generate_speech_json():
                 }), 400
             
             if quality == 'hd':
-                result = tts_service.generate_hd_speech(text, voice)
+                result = tts_service.generate_hd_speech(text, voice, translate_to=translate_to)
             else:
                 result = tts_service.generate_speech(text, voice, translate_to=translate_to)
         

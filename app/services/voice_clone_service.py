@@ -337,7 +337,7 @@ class VoiceCloneService:
                 'error': f'Voice cloning failed: {str(e)}'
             }
     
-    def generate_speech_with_cloned_voice(self, text, voice_id, output_path=None):
+    def generate_speech_with_cloned_voice(self, text, voice_id, output_path=None, translate_to=None):
         """
         Generate speech using a cloned voice with MiniMax T2A API
         
@@ -345,6 +345,7 @@ class VoiceCloneService:
             text: Text to convert to speech
             voice_id: ID of the cloned voice
             output_path: Path to save audio file
+            translate_to: Optional language to translate text to before speech
         
         Returns:
             dict: Result with audio file path
@@ -359,6 +360,23 @@ class VoiceCloneService:
                     'error': 'MiniMax API key not configured'
                 }
             
+            # Translate text if requested
+            speech_text = text
+            if translate_to:
+                from app.services.tts_service import tts_service
+                # Special handling for Turkish text
+                if translate_to == 'tr' and tts_service.is_turkish_text(text):
+                    # For Turkish text, ensure proper Turkish pronunciation
+                    speech_text = tts_service.ensure_turkish_pronunciation(text)
+                    print(f"🇹🇷 Turkish text processed for cloned voice: {speech_text[:100]}...")
+                else:
+                    translation_result = tts_service.translate_text(text, translate_to)
+                    if translation_result['success']:
+                        speech_text = translation_result['translated_text']
+                        print(f"🌐 Translated text for cloned voice: {speech_text[:100]}...")
+                    else:
+                        print(f"⚠️ Translation failed, using original text: {translation_result['error']}")
+            
             # Generate output path if not provided
             if not output_path:
                 temp_folder = os.path.abspath(current_app.config['TEMP_FOLDER'])
@@ -372,7 +390,7 @@ class VoiceCloneService:
             # Try with stream=True to get complete audio
             payload = {
                 "model": "speech-2.5-hd-preview",
-                "text": text,
+                "text": speech_text,
                 "voice_setting": {
                     "voice_id": voice_id,
                     "speed": 1.0,

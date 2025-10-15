@@ -45,9 +45,14 @@ class TTSService:
             # Translate text if requested
             speech_text = text
             if translate_to:
-                translation_result = self.translate_text(text, translate_to)
-                if translation_result['success']:
-                    speech_text = translation_result['translated_text']
+                # Special handling for Turkish text
+                if translate_to == 'tr' and self.is_turkish_text(text):
+                    # For Turkish text, ensure proper Turkish pronunciation
+                    speech_text = self.ensure_turkish_pronunciation(text)
+                else:
+                    translation_result = self.translate_text(text, translate_to)
+                    if translation_result['success']:
+                        speech_text = translation_result['translated_text']
             
             # Generate unique filename if not provided
             if not output_path:
@@ -76,6 +81,35 @@ class TTSService:
                 'success': False,
                 'error': str(e)
             }
+    
+    def is_turkish_text(self, text):
+        """Check if text contains Turkish characters"""
+        turkish_chars = 'çğıöşüÇĞIİÖŞÜ'
+        return any(char in turkish_chars for char in text)
+    
+    def ensure_turkish_pronunciation(self, text):
+        """Ensure Turkish text is properly formatted for TTS engines"""
+        # Replace Turkish characters with their closest English equivalents for better TTS
+        replacements = {
+            'ç': 'ch',
+            'ğ': 'gh', 
+            'ı': 'i',
+            'ö': 'oe',
+            'ş': 'sh',
+            'ü': 'ue',
+            'Ç': 'Ch',
+            'Ğ': 'Gh',
+            'İ': 'I',
+            'Ö': 'Oe', 
+            'Ş': 'Sh',
+            'Ü': 'Ue'
+        }
+        
+        result = text
+        for turkish_char, english_equiv in replacements.items():
+            result = result.replace(turkish_char, english_equiv)
+        
+        return result
     
     def translate_text(self, text, target_language):
         """
@@ -129,7 +163,7 @@ class TTSService:
                 'error': str(e)
             }
     
-    def generate_hd_speech(self, text, voice="alloy", output_path=None):
+    def generate_hd_speech(self, text, voice="alloy", output_path=None, translate_to=None):
         """
         Generate high-quality speech from text
         
@@ -137,12 +171,25 @@ class TTSService:
             text: Text to convert to speech
             voice: Voice to use
             output_path: Path to save audio file
+            translate_to: Optional language to translate text to before speech
         
         Returns:
             dict: Result with audio file path
         """
         try:
             client = self.init_client()
+            
+            # Translate text if requested
+            speech_text = text
+            if translate_to:
+                # Special handling for Turkish text
+                if translate_to == 'tr' and self.is_turkish_text(text):
+                    # For Turkish text, ensure proper Turkish pronunciation
+                    speech_text = self.ensure_turkish_pronunciation(text)
+                else:
+                    translation_result = self.translate_text(text, translate_to)
+                    if translation_result['success']:
+                        speech_text = translation_result['translated_text']
             
             if not output_path:
                 temp_folder = current_app.config['TEMP_FOLDER']
@@ -152,7 +199,7 @@ class TTSService:
             response = client.audio.speech.create(
                 model="tts-1-hd",
                 voice=voice,
-                input=text
+                input=speech_text
             )
             
             response.stream_to_file(output_path)
@@ -161,7 +208,8 @@ class TTSService:
                 'success': True,
                 'audio_path': output_path,
                 'voice': voice,
-                'quality': 'hd'
+                'quality': 'hd',
+                'translated_to': translate_to if translate_to else None
             }
         except Exception as e:
             return {
